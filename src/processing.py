@@ -1,4 +1,4 @@
-def filter_by_state(data, state="EXECUTED"):
+def filter_by_state(data: list[dict], state: str = "EXECUTED") -> list[dict]:
     """Принимает список словарей и опционально значение для ключа state.
 Функция возвращает новый список словарей, содержащий только те словари,
 у которых ключ state соответствует указанному значению"""
@@ -14,7 +14,7 @@ def filter_by_state(data, state="EXECUTED"):
     return filtered_list
 
 
-def sort_by_date(data, reverse=True):
+def sort_by_date(data: list[dict], reverse: bool = True) -> list[dict]:
     """Принимает список словарей и возвращает отсортированный
     по дате список"""
 
