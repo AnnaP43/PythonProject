@@ -1,0 +1,48 @@
+name: Tests and Coverage
+
+# Когда запускать: при каждом пуше в любую ветку и при создании Pull Request
+on:
+  push:
+    branches: [ main, master, "feature/*" ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    # На какой операционной системе запускать
+    runs-on: ubuntu-latest
+
+    steps:
+      # Шаг 1: Скачать код из репозитория
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Шаг 2: Установить Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'   # Можешь поменять на 3.11 или 3.14
+
+      # Шаг 3: Установить Poetry
+      - name: Install Poetry
+        run: pip install poetry
+
+      # Шаг 4: Установить зависимости проекта
+      - name: Install dependencies
+        run: poetry install
+
+      # Шаг 5: Запустить тесты и сгенерировать HTML-отчет
+      - name: Run tests with coverage
+        run: poetry run pytest --cov=src --cov-report=html
+
+      # Шаг 6: Сохранить HTML-отчет как артефакт (чтобы можно было скачать)
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov/
+
+
+
+
+
