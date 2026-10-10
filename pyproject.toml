@@ -42,3 +42,6 @@ warn_return_any = true
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
