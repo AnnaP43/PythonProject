@@ -21,6 +21,10 @@ lint = [
     "black (>=26.5.1,<27.0.0)",
     "isort (>=9.0.1,<10.0.0)"
 ]
+dev = [
+    "pytest (>=9.1.1,<10.0.0)",
+    "pytest-cov (>=7.1.0,<8.0.0)"
+]
 
 [tool.black]
 line-length = 119
@@ -34,3 +38,7 @@ line_length = 119
 python_version = "3.14"
 disallow_untyped_defs = true
 warn_return_any = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
