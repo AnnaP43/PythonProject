@@ -25,11 +25,11 @@ jobs:
 
       # Шаг 3: Установить Poetry
       - name: Install Poetry
-        run: pip install poetry --no-root
+        run: pip install poetry
 
       # Шаг 4: Установить зависимости проекта
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-root
 
       # Шаг 5: Запустить тесты и сгенерировать HTML-отчет
       - name: Run tests with coverage
