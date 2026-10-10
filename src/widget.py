@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from src.masks import get_mask_account, get_mask_card_number
 
 
@@ -27,4 +28,4 @@ def get_date(date_str: str) -> str:
     """Принимает строку с датой в формате '2024-03-11T02:26:18.671407'
  и возвращает строку с датой в формате 'ДД.ММ.ГГГГ'"""
     parsed_date = datetime.fromisoformat(date_str)
-    return parsed_date.strftime("%d.%m.%y")
+    return parsed_date.strftime("%d.%m.%Y")
