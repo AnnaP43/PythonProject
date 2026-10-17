@@ -1,5 +1,6 @@
-from src.widget import mask_account_card, get_date
+from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 from src.processing import filter_by_state, sort_by_date
+from src.widget import get_date, mask_account_card
 
 
 def main() -> None:
@@ -33,6 +34,44 @@ def main() -> None:
 
     print(f"\nФильтр: {filter_by_state(test_data)}")
     print(f"Сортировка по дате: {sort_by_date(test_data)}")
+
+    # проверка для generators.py
+    print("ПРОВЕРКА ГЕНЕРАТОРОВ")
+
+    transactions = [
+        {
+            "id": 939719570,
+            "operationAmount": {"currency": {"code": "USD"}},
+            "description": "Перевод организации",
+        },
+        {
+            "id": 873106923,
+            "operationAmount": {"currency": {"code": "RUB"}},
+            "description": "Перевод со счета на счет",
+        },
+        {
+            "id": 142264268,
+            "operationAmount": {"currency": {"code": "USD"}},
+            "description": "Перевод с карты на карту",
+        },
+    ]
+
+    # 1. Проверка filter_by_currency
+    print("\n1. Фильтрация по USD:")
+    usd_transactions = filter_by_currency(transactions, "USD")
+    for transaction in usd_transactions:
+        print(f"  ID: {transaction['id']}, Описание: {transaction['description']}")
+
+    # 2. Проверка transaction_descriptions
+    print("\n2. Описания транзакций:")
+    descriptions = transaction_descriptions(transactions)
+    for desc in descriptions:
+        print(f"  {desc}")
+
+    # 3. Проверка card_number_generator
+    print("\n3. Генерация номеров карт (от 1 до 5):")
+    for card in card_number_generator(1, 5):
+        print(f"  {card}")
 
 
 if __name__ == "__main__":
