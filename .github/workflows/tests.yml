@@ -1,8 +1,9 @@
 name: Tests and Coverage
 
 permissions:
-  pull-requests: write
   contents: read
+  pull-requests: write
+  issues: write
 
 # Когда запускать: при каждом пуше в любую ветку и при создании Pull Request
 on:
@@ -49,7 +50,7 @@ jobs:
 
       # Шаг 7: Теперь бот без проблем прочитает текстовый файл и оставит красивый комментарий в PR
       - name: Pytest coverage comment
-        uses: MishaKav/pytest-coverage-comment@main
+        uses: MishaKav/pytest-coverage-comment@v1
         if: always()
         with:
           pytest-coverage-path: ./pytest-coverage.txt
