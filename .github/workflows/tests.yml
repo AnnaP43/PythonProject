@@ -1,5 +1,9 @@
 name: Tests and Coverage
 
+permissions:
+  pull-requests: write
+  contents: read
+
 # Когда запускать: при каждом пуше в любую ветку и при создании Pull Request
 on:
   push:
@@ -41,6 +45,14 @@ jobs:
         with:
           name: coverage-report
           path: htmlcov/
+
+      # Шаг 7: Автоматическое комментирование прямо в Pull Request (Опционально, но очень удобно)
+      # Бот сам посчитает проценты и красиво напишет их в комментариях к PR, чтобы не скачивать архив.
+      - name: Pytest coverage comment
+        uses: MishaKav/pytest-coverage-comment@main
+        if: always() # Запускать этот шаг, даже если тесты упали из-за низкого покрытия
+        with:
+          - pytest-coverage-path: ./htmlcov/index.html
 
 
 
