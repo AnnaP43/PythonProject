@@ -52,7 +52,7 @@ jobs:
         uses: MishaKav/pytest-coverage-comment@main
         if: always() # Запускать этот шаг, даже если тесты упали из-за низкого покрытия
         with:
-          - pytest-coverage-path: ./htmlcov/index.html
+          pytest-coverage-path: ./htmlcov/index.html
 
 
 
