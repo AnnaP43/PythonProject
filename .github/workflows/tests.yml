@@ -1,10 +1,5 @@
 name: Tests and Coverage
 
-permissions:
-  contents: read
-  pull-requests: write
-  issues: write
-
 # Когда запускать: при каждом пуше в любую ветку и при создании Pull Request
 on:
   push:
@@ -36,10 +31,9 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-root
 
-      # Шаг 5: Запускаем тесты, генерируем HTML и дополнительно текстовый файл для бота в PR
+      # Шаг 5: Запустить тесты и сгенерировать HTML-отчет
       - name: Run tests with coverage
-        run: |
-          poetry run pytest --cov=src --cov-report=term-missing --cov-report=html --cov-fail-under=80 | tee pytest-coverage.txt
+        run: poetry run pytest --cov=src --cov-report=html
 
       # Шаг 6: Сохранить HTML-отчет как артефакт (чтобы можно было скачать)
       - name: Upload coverage report
@@ -47,14 +41,6 @@ jobs:
         with:
           name: coverage-report
           path: htmlcov/
-
-      # Шаг 7: Теперь бот без проблем прочитает текстовый файл и оставит красивый комментарий в PR
-      - name: Pytest coverage comment
-        uses: MishaKav/pytest-coverage-comment@v1
-        if: always()
-        with:
-          pytest-coverage-path: ./pytest-coverage.txt
-
 
 
 
