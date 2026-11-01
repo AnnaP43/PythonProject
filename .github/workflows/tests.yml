@@ -30,6 +30,7 @@ jobs:
       # Шаг 4: Установить зависимости проекта
       - name: Install dependencies
         run: poetry install --no-root
+             poetry run pip install requests python-dotenv
 
       # Шаг 5: Запустить тесты и сгенерировать HTML-отчет
       - name: Run tests with coverage
