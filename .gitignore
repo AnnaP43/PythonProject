@@ -222,3 +222,6 @@ __marimo__/
 # Тестирование и отчеты покрытия (Coverage)
 .coverage
 htmlcov/
+
+#API_KEY
+.env
