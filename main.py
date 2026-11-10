@@ -1,77 +1,113 @@
-from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
+from src.csv_excel_reader import read_csv_transactions, read_excel_transactions
 from src.processing import filter_by_state, sort_by_date
+from src.services import process_bank_search
+from src.utils import read_json_file
 from src.widget import get_date, mask_account_card
 
 
 def main() -> None:
-    # Пример для проверки работы функций
-    examples = [
-        "Maestro 1596837868705199",
-        "Счет 64686473678894779589",
-        "MasterCard 7158300734726758",
-        "Счет 35383033474447895560",
-        "Visa Classic 6831982476737658",
-        "Visa Platinum 8990922113665229",
-        "Visa Gold 5999414228426353",
-        "Счет 73654108430135874305",
-    ]
+    """Основная логика программы, связывающая функционал модулей."""
+    print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
 
-    for item in examples:
-        print(item)
-        print(f"Выход: {mask_account_card(item)}\n")
+    print("\nВыберите необходимый пункт меню:")
+    print("1. Получить информацию о транзакциях из JSON-файла")
+    print("2. Получить информацию о транзакциях из CSV-файла")
+    print("3. Получить информацию о транзакциях из XLSX-файла")
 
-    date_str = "2024-03-11T02:26:18.671407"
-    print(f"Вход: {date_str}")
-    print(f"Выход: {get_date(date_str)}")
+    choice = input("Пользователь: ")
 
-    # проверки для processing.py
-    test_data = [
-        {'id': 41428829, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
-        {'id': 615064591, 'state': 'CANCELED', 'date': '2018-10-14T08:21:33.419441'},
-        {'id': 594226727, 'state': 'CANCELED', 'date': '2018-09-12T21:27:25.241689'},
-        {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'}
-    ]
+    transactions = []
+    if choice == "1":
+        print("\nДля обработки выбран JSON-файл.")
+        transactions = read_json_file("data/operations.json")
+    elif choice == "2":
+        print("\nДля обработки выбран CSV-файл.")
+        transactions = read_csv_transactions("data/transactions.csv")
+    elif choice == "3":
+        print("\nДля обработки выбран XLSX-файл.")
+        transactions = read_excel_transactions("data/transactions_excel.xlsx")
+    else:
+        print("Неверный выбор. Завершение работы.")
+        return
 
-    print(f"\nФильтр: {filter_by_state(test_data)}")
-    print(f"Сортировка по дате: {sort_by_date(test_data)}")
+    if not transactions:
+        print("\nНе удалось прочитать файл или он пуст.")
+        return
 
-    # проверка для generators.py
-    print("ПРОВЕРКА ГЕНЕРАТОРОВ")
+    # Фильтрация по статусу
+    while True:
+        print("\nВведите статус, по которому необходимо выполнить фильтрацию.")
+        print("Доступные для фильтровки статусы: EXECUTED, CANCELED, PENDING")
+        status_input = input("Пользователь: ").upper()
 
-    transactions = [
-        {
-            "id": 939719570,
-            "operationAmount": {"currency": {"code": "USD"}},
-            "description": "Перевод организации",
-        },
-        {
-            "id": 873106923,
-            "operationAmount": {"currency": {"code": "RUB"}},
-            "description": "Перевод со счета на счет",
-        },
-        {
-            "id": 142264268,
-            "operationAmount": {"currency": {"code": "USD"}},
-            "description": "Перевод с карты на карту",
-        },
-    ]
+        if status_input in ["EXECUTED", "CANCELED", "PENDING"]:
+            transactions = filter_by_state(transactions, status_input)
+            print(f'Операции отфильтрованы по статусу "{status_input}"')
+            break
+        else:
+            print(f'Статус операции "{status_input}" недоступен.')
 
-    # 1. Проверка filter_by_currency
-    print("\n1. Фильтрация по USD:")
-    usd_transactions = filter_by_currency(transactions, "USD")
-    for transaction in usd_transactions:
-        print(f"  ID: {transaction['id']}, Описание: {transaction['description']}")
+    # Сортировка по дате
+    print("\nОтсортировать операции по дате? Да/Нет")
+    sort_choice = input("Пользователь: ").lower()
 
-    # 2. Проверка transaction_descriptions
-    print("\n2. Описания транзакций:")
-    descriptions = transaction_descriptions(transactions)
-    for desc in descriptions:
-        print(f"  {desc}")
+    if sort_choice == "да":
+        print("Программа: Отсортировать по возрастанию или по убыванию?")
+        order = input("Пользователь: ").lower()
 
-    # 3. Проверка card_number_generator
-    print("\n3. Генерация номеров карт (от 1 до 5):")
-    for card in card_number_generator(1, 5):
-        print(f"  {card}")
+        if order == "по убыванию" or order == "убывание":
+            transactions = sort_by_date(transactions, reverse=True)
+        else:
+            transactions = sort_by_date(transactions, reverse=False)
+
+    # Фильтрация по рублям
+    print("\nВыводить только рублевые транзакции? Да/Нет")
+    rub_choice = input("Пользователь: ").lower()
+    if rub_choice == "да":
+        transactions = [
+            t for t in transactions
+            if t.get("operationAmount", {}).get("currency", {}).get("code") == "RUB"
+        ]
+
+    # Поиск по описанию
+    print("\nОтфильтровать список транзакций по определенному слову в описании? Да/Нет")
+    search_choice = input("Пользователь: ").lower()
+    if search_choice == "да":
+        search_word = input("Введите слово для поиска: ")
+        transactions = process_bank_search(transactions, search_word)
+
+    # Вывод результата
+    print("\nРаспечатываю итоговый список транзакций...\n")
+
+    if not transactions:
+        print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации")
+        return
+
+    print(f"Всего банковских операций в выборке: {len(transactions)}\n")
+
+    for t in transactions:
+        # Получаем данные безопасно
+        date = get_date(t.get("date", ""))
+        desc = t.get("description", "Без описания")
+        amount_info = t.get("operationAmount", {})
+        amount = amount_info.get("amount", "0")
+        currency = amount_info.get("currency", {}).get("name", "")
+
+        from_acc = t.get("from")
+        to_acc = t.get("to")
+
+        print(f"{date} {desc}")
+
+        # Выводим маскированные счета/карты
+        if from_acc and to_acc:
+            print(f"{mask_account_card(from_acc)} -> {mask_account_card(to_acc)}")
+        else:
+            if from_acc:
+                print(mask_account_card(from_acc))
+            if to_acc:
+                print(mask_account_card(to_acc))
+
+        print(f"Сумма: {amount} {currency}\n")
 
 
 if __name__ == "__main__":
